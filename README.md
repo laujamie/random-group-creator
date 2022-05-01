@@ -8,6 +8,29 @@ in each group), to make creating balanced random groups easier.
 
 This was built using Vite, React, TypeScript, and Mantine.
 
+## Development
+
+First, clone this repository:
+
+``` bash
+# HTTPS
+$ git clone https://github.com/laujamie/random-group-creator.git
+# SSH
+$ git clone git@github.com:laujamie/random-group-creator.git
+```
+
+Then install dependencies:
+
+``` bash
+$ npm install
+```
+
+To run locally, run:
+
+``` bash
+$ npm run dev
+```
+
 ## Demo
 
 A demo of this app can be found [here](https://randomize-groups.netlify.app/).
