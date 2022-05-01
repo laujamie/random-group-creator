@@ -1,13 +1,33 @@
 import { useCallback, useState } from 'react';
-import { Button, Input, Text, Group, Container, Table } from '@mantine/core';
+import {
+  Button,
+  Text,
+  Group,
+  Container,
+  Table,
+  TextInput,
+} from '@mantine/core';
 import { Upload } from 'tabler-icons-react';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import type { DropzoneProps } from '@mantine/dropzone';
+import { useForm } from '@mantine/form';
 import Papa from 'papaparse';
 
+import { shuffleArray, partitionArray } from '@/util/array';
+
 function App() {
-  const [csvState, setCsvState] = useState<any>(null);
+  const [csvState, setCsvState] = useState<Array<any>>([]);
   const [csvError, setCSVError] = useState(false);
+  const [groupState, setGroupState] = useState<Array<Array<any>>>([]);
+
+  const form = useForm({
+    initialValues: {
+      numGroups: 0,
+    },
+    validate: {
+      numGroups: (value) => (value > 0 ? null : 'Invalid number of groups'),
+    },
+  });
 
   const onDrop = useCallback<DropzoneProps['onDrop']>((files) => {
     if (files.length === 0) return;
@@ -57,7 +77,7 @@ function App() {
           </Group>
         )}
       </Dropzone>
-      {csvState != null && (
+      {csvState.length > 0 && (
         <div>
           <Table>
             <thead>
@@ -77,6 +97,47 @@ function App() {
               ))}
             </tbody>
           </Table>
+          <form
+            onSubmit={form.onSubmit((values) => {
+              setGroupState(
+                partitionArray(shuffleArray(csvState), values.numGroups)
+              );
+            })}
+          >
+            <Group mt={8} align="flex-end">
+              <TextInput
+                type="number"
+                label="Number of Groups"
+                required
+                {...form.getInputProps('numGroups')}
+              />
+              <Button type="submit">Randomize!</Button>
+            </Group>
+          </form>
+        </div>
+      )}
+      {groupState.length > 0 && (
+        <div>
+          {groupState.map((group, i) => (
+            <Table key={`random-group-${i}`}>
+              <thead>
+                <tr>
+                  {Object.keys(group[0]).map((name) => (
+                    <th key={name}>{name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {group.map((row, j) => (
+                  <tr key={`random-group-row-${i}-${j}`}>
+                    {Object.values(row).map((val: any) => (
+                      <td key={val}>{val}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ))}
         </div>
       )}
     </Container>
